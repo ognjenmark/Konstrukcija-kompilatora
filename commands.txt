@@ -1,0 +1,13 @@
+./bin/clang -emit-llvm -S ConstantPropagation.c -o ConstantPropagation.ll
+./bin/opt -load lib/LLVMOurDominatorPass.so -enable-new-pm=0 -our-constant-propagation ConstantPropagation.ll -S -o ConstantPropagationTmp.ll 
+
+./bin/opt -load lib/LLVMOurDominatorPass.so -enable-new-pm=0 -constant-folding ConstantPropagationTmp.ll -S -o ConstantFolding.ll 
+
+./bin/clang -emit-llvm -S DCE.c -o DCE.ll
+./bin/opt -load lib/LLVMOurDominatorPass.so -enable-new-pm=0 -dead-code-elimination DCE.ll -S -o DCETmp.ll 
+
+./bin/clang -emit-llvm -S CSE.c -o CSE.ll
+./bin/opt -load lib/LLVMOurDominatorPass.so -enable-new-pm=0 -cse-pass CSE.ll -S -o CSETmp.ll 
+
+./bin/clang -emit-llvm -S DBBE.c -o DBBE.ll
+./bin/opt -load lib/LLVMOurDominatorPass.so -enable-new-pm=0 -dead-basic-block-elim DBBE.ll -S -o DBBETmp.ll 
